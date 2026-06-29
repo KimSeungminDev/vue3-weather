@@ -1,34 +1,34 @@
 <template>
-	<header class="header">
+	<header v-if="currentConditions" class="header">
 		<!-- 지역 -->
 		<h1 class="header__title">
 			<span class="material-symbols-outlined"> location_on </span>서울
 		</h1>
-		<h2 class="header__date">11:00</h2>
+		<h2 class="header__date">{{ dayjs().format('HH:mm') }}</h2>
 	</header>
 	<!-- 현재 날씨 -->
-	<main class="main">
+	<main v-if="currentConditions" class="main">
 		<article class="weather">
 			<section class="weather__info">
 				<img
-					src="@/assets/images/icons/cloudy.png"
-					alt=""
+					:src="getImage(currentConditions.icon)"
+					alt="`${currentConditions.datetime} ${currentConditions.temp}도`"
 					class="weather__img"
 				/>
-				<h3 class="weather_temp">28°</h3>
-				<p class="weather_summary">대체로 맑음</p>
+				<h3 class="weather_temp">{{ currentConditions.temp }}°</h3>
+				<p class="weather_summary">{{ currentConditions.conditions }}</p>
 				<ul class="weather__moreList">
 					<li class="weather__moreListItem">
 						<p class="weather__subtitle">습도</p>
-						<p class="weather__desc">82%</p>
+						<p class="weather__desc">{{ currentConditions.humidity }}%</p>
 					</li>
 					<li class="weather__moreListItem">
 						<p class="weather__subtitle">풍속</p>
-						<p class="weather__desc">4.12/ms</p>
+						<p class="weather__desc">{{ currentConditions.windspeed }}/ms</p>
 					</li>
 					<li class="weather__moreListItem">
 						<p class="weather__subtitle">체감</p>
-						<p class="weather__desc">7도</p>
+						<p class="weather__desc">{{ currentConditions.feelslike }}</p>
 					</li>
 				</ul>
 			</section>
@@ -36,6 +36,18 @@
 	</main>
 </template>
 
-<script setup></script>
+<script setup>
+import { useWeatherStore } from '@/stores/weather';
+import { storeToRefs } from 'pinia';
+import { onBeforeMount } from 'vue';
+import dayjs from 'dayjs';
+
+import { getImage } from '@/composables/helper.js';
+const weatherStore = useWeatherStore();
+const { currentConditions } = storeToRefs(weatherStore);
+onBeforeMount(async () => {
+	weatherStore.getCurrentWeatherInfo();
+});
+</script>
 
 <style lang="scss" scoped></style>
