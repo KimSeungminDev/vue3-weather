@@ -30,7 +30,12 @@
 					class="weather__cityImg"
 				/>
 			</div>
-			<span class="material-symbols-outlined weather__cancel"> cancel </span>
+			<span
+				class="material-symbols-outlined weather__cancel"
+				@click="removeItem(data.address)"
+			>
+				cancel
+			</span>
 		</section>
 		<!-- 검색 데이터가 없으면 -->
 		<section v-if="searchData.length === 0" class="no-data">
@@ -42,7 +47,7 @@
 <script setup>
 import { useWeatherStore } from '@/stores/weather';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch, onBeforeMount } from 'vue';
 import { getImage } from '@/composables/helper';
 const weatherStore = useWeatherStore();
 const { searchData } = storeToRefs(weatherStore);
@@ -50,6 +55,20 @@ const city = ref('');
 const searchWeather = async () => {
 	await weatherStore.getSearchWeatherInfo(city.value);
 	city.value = '';
+};
+watch(
+	() => searchData,
+	newValue => {
+		localStorage.setItem('searchData', JSON.stringify(newValue.value));
+	},
+	{ deep: true },
+);
+onBeforeMount(() => {
+	const localData = JSON.parse(localStorage.getItem('searchData')) || [];
+	searchData.value = localData;
+});
+const removeItem = address => {
+	searchData.value = searchData.value.filter(v => v.address !== address);
 };
 </script>
 
