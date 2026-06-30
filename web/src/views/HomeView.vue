@@ -2,7 +2,7 @@
 	<header v-if="currentConditions" class="header">
 		<!-- 지역 -->
 		<h1 class="header__title">
-			<span class="material-symbols-outlined"> location_on </span>서울
+			<span class="material-symbols-outlined"> location_on </span>{{ address }}
 		</h1>
 		<h2 class="header__date">{{ dayjs().format('HH:mm') }}</h2>
 	</header>
@@ -44,8 +44,9 @@ import dayjs from 'dayjs';
 
 import { getImage } from '@/composables/helper.js';
 const weatherStore = useWeatherStore();
-const { currentConditions } = storeToRefs(weatherStore);
+const { currentConditions, address } = storeToRefs(weatherStore);
 onBeforeMount(async () => {
+	weatherStore.getCityName();
 	weatherStore.getCurrentWeatherInfo();
 });
 </script>
